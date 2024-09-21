@@ -1,6 +1,8 @@
 package tdroid.note.ui.add_edit_note
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
@@ -28,8 +30,12 @@ class AddEditNoteViewModel @Inject constructor(
     private val _noteContent = mutableStateOf(NoteTextFieldState(hint = "Enter some content"))
     val noteContent: State<NoteTextFieldState> = _noteContent
 
-    private val _noteColor = mutableStateOf(Note.noteColors.random().toArgb())
+    private val _noteColor = mutableIntStateOf(Note.noteColors.random().toArgb())
     val noteColor: State<Int> = _noteColor
+
+    private val _reminderDate = mutableLongStateOf(0L)
+    val reminderDate: State<Long> = _reminderDate
+
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -97,7 +103,8 @@ class AddEditNoteViewModel @Inject constructor(
                                 content = noteContent.value.text,
                                 timestamp = System.currentTimeMillis(),
                                 color = noteColor.value,
-                                id = currentNoteId
+                                id = currentNoteId,
+                                timeReminder = reminderDate.value
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
@@ -109,6 +116,9 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
 
+            is AddEditNoteEvent.EnteredReminderDate ->  {
+                _reminderDate.longValue = event.date
+            }
         }
     }
 

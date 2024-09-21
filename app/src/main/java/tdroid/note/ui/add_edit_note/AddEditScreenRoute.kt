@@ -88,6 +88,7 @@ fun AddEditScreenRoute(
         noteColor = noteColor,
         noteTitle = viewModel.noteTitle.value,
         noteContent = viewModel.noteContent.value,
+        reminderDate = viewModel.reminderDate.value,
         onEvent = {
             viewModel.onEvent(it)
         }
@@ -102,7 +103,7 @@ fun AddEditScreen(
     onEvent: (AddEditNoteEvent) -> Unit,
     noteTitle: NoteTextFieldState,
     noteContent: NoteTextFieldState,
-
+    reminderDate : Long
     ) {
     val noteBgAnimation = remember {
         Animatable(
@@ -114,14 +115,12 @@ fun AddEditScreen(
 
     var showDatePicker = remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
+//    val selectedDate = datePickerState.selectedDateMillis?.let {
+//        convertMillisToDate(it)
+//    } ?: ""
     // To animate the above color, we need a scope
     val scope = rememberCoroutineScope()
-    val reminderDate = remember {
-        mutableStateOf("reminder")
-    }
+
     Scaffold(
         floatingActionButton = {
             //fire an event to ViewModel to save a note, during onClick operation
@@ -216,7 +215,7 @@ fun AddEditScreen(
                     modifier = Modifier.fillMaxHeight()
                 )
 
-                Text(text = reminderDate.value ,
+                Text(text =if (reminderDate == 0L) "reminder" else convertMillisToDate(reminderDate) ,
                     color = Color.Gray,
                     modifier =
                     Modifier
@@ -229,7 +228,7 @@ fun AddEditScreen(
 
             if (showDatePicker.value) {
                 DatePickerModal(onDateSelected = {
-                    reminderDate.value = convertMillisToDate(it ?: 0)
+                    onEvent(AddEditNoteEvent.EnteredReminderDate(it ?: 0))
                 } , onDismiss = {
                     showDatePicker.value = false
                 })
@@ -317,7 +316,7 @@ fun AddEditScreenPreview() {
     AddEditScreen(noteColor = 1 ,
         noteTitle = NoteTextFieldState(text = "test" , hint = "test" , false) ,
         noteContent = NoteTextFieldState(text = "test" , hint = "test" , false) ,
-        onEvent = {}
-
+        onEvent = {},
+        reminderDate = 0
     )
 }

@@ -108,6 +108,7 @@ fun NoteItemUIPreview() {
             "Morning Task",
             "This is a sample Note",
             1234,
+            1,
             1
         ),
         modifier = Modifier.padding(16.dp),
