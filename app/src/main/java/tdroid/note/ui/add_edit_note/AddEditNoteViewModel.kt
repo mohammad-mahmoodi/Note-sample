@@ -73,6 +73,7 @@ class AddEditNoteViewModel @Inject constructor(
             _noteContent.value = noteContent.value.copy(text  = editedNote?.content ?: "", isHintVisible = false)
             _noteColor.value =  editedNote?.color ?: 0
             _reminderDate.longValue = editedNote?.timeReminder ?: 0
+            currentNoteId = editedNote?.id
         }
     }
 
