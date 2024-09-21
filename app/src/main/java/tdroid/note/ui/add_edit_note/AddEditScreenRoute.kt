@@ -19,15 +19,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -41,6 +51,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import tdroid.note.domain.model.Note
 import tdroid.note.ui.add_edit_note.components.HintUI
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun AddEditScreenRoute(
@@ -81,13 +95,15 @@ fun AddEditScreenRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditScreen(  noteColor: Int,
-                    onEvent : (AddEditNoteEvent)->Unit,
-                    noteTitle : NoteTextFieldState,
-                    noteContent : NoteTextFieldState,
+fun AddEditScreen(
+    noteColor: Int,
+    onEvent: (AddEditNoteEvent) -> Unit,
+    noteTitle: NoteTextFieldState,
+    noteContent: NoteTextFieldState,
 
-) {
+    ) {
     val noteBgAnimation = remember {
         Animatable(
             Color(
@@ -96,8 +112,16 @@ fun AddEditScreen(  noteColor: Int,
         )
     }
 
+    var showDatePicker = remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        convertMillisToDate(it)
+    } ?: ""
     // To animate the above color, we need a scope
     val scope = rememberCoroutineScope()
+    val reminderDate = remember {
+        mutableStateOf("reminder")
+    }
     Scaffold(
         floatingActionButton = {
             //fire an event to ViewModel to save a note, during onClick operation
@@ -191,9 +215,99 @@ fun AddEditScreen(  noteColor: Int,
                     textStyle = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.fillMaxHeight()
                 )
+
+                Text(text = reminderDate.value ,
+                    color = Color.Gray,
+                    modifier =
+                    Modifier
+                        .padding(top = 12.dp)
+                        .clickable {
+                            showDatePicker.value = !showDatePicker.value
+                        }
+                )
+            }
+
+            if (showDatePicker.value) {
+                DatePickerModal(onDateSelected = {
+                    reminderDate.value = convertMillisToDate(it ?: 0)
+                } , onDismiss = {
+                    showDatePicker.value = false
+                })
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+    var showTimePicker = remember {
+        mutableStateOf(false)
+    }
+
+    val currentTime = Calendar.getInstance()
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
+        initialMinute = currentTime.get(Calendar.MINUTE),
+        is24Hour = true,
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                if (!showTimePicker.value) {
+                    showTimePicker.value = true
+                    return@TextButton
+                }
+
+                val c = Calendar.getInstance(Locale.getDefault())
+                c.time = Date(datePickerState.selectedDateMillis ?: 0)
+                c.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                c.set(Calendar.MINUTE, timePickerState.minute)
+
+                onDateSelected(c.time.time)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        if (showTimePicker.value == true) {
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Center , horizontalAlignment = Alignment.CenterHorizontally) {
+                TimePicker(
+                    state = timePickerState,
+                )
+            }
+
+        } else {
+            DatePicker(state = datePickerState)
+
+        }
+
+    }
+}
+
+
+
+
+
+fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("MM/dd/yyyy hh:mm", Locale.getDefault())
+    return formatter.format(Date(millis))
 }
 
 @Composable
