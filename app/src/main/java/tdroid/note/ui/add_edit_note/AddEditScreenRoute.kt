@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -42,23 +43,12 @@ import tdroid.note.domain.model.Note
 import tdroid.note.ui.add_edit_note.components.HintUI
 
 @Composable
-fun AddEditScreenUI(
+fun AddEditScreenRoute(
     navController: NavController,
     noteColor: Int,
     viewModel: AddEditNoteViewModel = hiltViewModel()
 ) {
-    val titleState = viewModel.noteTitle.value
-    val contentState = viewModel.noteContent.value
-    val noteBgAnimation = remember {
-        Animatable(
-            Color(
-                if (noteColor != -1) noteColor else viewModel.noteColor.value
-            )
-        )
-    }
 
-    // To animate the above color, we need a scope
-    val scope = rememberCoroutineScope()
 
     // Getting all the latest events
     LaunchedEffect(key1 = true) {
@@ -81,12 +71,40 @@ fun AddEditScreenUI(
         }
     }
 
+    AddEditScreen(
+        noteColor = noteColor,
+        noteTitle = viewModel.noteTitle.value,
+        noteContent = viewModel.noteContent.value,
+        onEvent = {
+            viewModel.onEvent(it)
+        }
+
+    )
+}
+
+@Composable
+fun AddEditScreen(  noteColor: Int,
+                    onEvent : (AddEditNoteEvent)->Unit,
+                    noteTitle : NoteTextFieldState,
+                    noteContent : NoteTextFieldState,
+
+) {
+    val noteBgAnimation = remember {
+        Animatable(
+            Color(
+                if (noteColor != -1) noteColor else noteColor
+            )
+        )
+    }
+
+    // To animate the above color, we need a scope
+    val scope = rememberCoroutineScope()
     Scaffold(
         floatingActionButton = {
             //fire an event to ViewModel to save a note, during onClick operation
             FloatingActionButton(
                 onClick = {
-                    viewModel.onEvent(AddEditNoteEvent.SaveNote)
+                    onEvent(AddEditNoteEvent.SaveNote)
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
@@ -119,7 +137,7 @@ fun AddEditScreenUI(
                                 .background(color)
                                 .border(
                                     width = 4.dp,
-                                    color = if (viewModel.noteColor.value == colorInt) {
+                                    color = if (noteColor == colorInt) {
                                         Color.Black  //color is selected
                                     } else {
                                         Color.Transparent  //color is deselected
@@ -134,7 +152,7 @@ fun AddEditScreenUI(
                                         )
                                     }
 
-                                    viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
+                                    onEvent(AddEditNoteEvent.ChangeColor(colorInt))
                                 }
 
                         )
@@ -145,15 +163,15 @@ fun AddEditScreenUI(
 
                 // For Title
                 HintUI(
-                    text = titleState.text,
-                    hint = titleState.hint,
+                    text = noteTitle.text,
+                    hint = noteTitle.hint,
                     onValueChange = {
-                        viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
+                        onEvent(AddEditNoteEvent.EnteredTitle(it))
                     },
                     onFocusChange = {
-                        viewModel.onEvent(AddEditNoteEvent.ChangeTitleFocus(it))
+                        onEvent(AddEditNoteEvent.ChangeTitleFocus(it))
                     },
-                    isHintVisible = titleState.isHintVisible,
+                    isHintVisible = noteTitle.isHintVisible,
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyMedium
                 )
@@ -162,19 +180,31 @@ fun AddEditScreenUI(
 
                 // For Content
                 HintUI(
-                    text = contentState.text,
-                    hint = contentState.hint,
+                    text = noteContent.text,
+                    hint = noteContent.hint,
                     onValueChange = {
-                        viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
+                        onEvent(AddEditNoteEvent.EnteredContent(it))
                     },
                     onFocusChange = {
-                        viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
+                        onEvent(AddEditNoteEvent.ChangeContentFocus(it))
                     },
-                    isHintVisible = contentState.isHintVisible,
+                    isHintVisible = noteContent.isHintVisible,
                     textStyle = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.fillMaxHeight()
                 )
             }
         }
+    )
+}
+
+@Composable
+@Preview
+fun AddEditScreenPreview() {
+
+    AddEditScreen(noteColor = 1 ,
+        noteTitle = NoteTextFieldState(text = "dfds" , hint = "dsfs" , false) ,
+        noteContent = NoteTextFieldState(text = "dfds" , hint = "dsfs" , false) ,
+        onEvent = {}
+
     )
 }

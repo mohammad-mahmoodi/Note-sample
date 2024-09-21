@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import tdroid.note.ui.add_edit_note.AddEditScreenUI
+import tdroid.note.ui.add_edit_note.AddEditScreenRoute
 import tdroid.note.ui.notes.NotesScreen
 
 @Composable
@@ -40,7 +40,7 @@ fun AppNavHost() {
                 )
             ) {
                 val color = it.arguments?.getInt("noteColor") ?: -1
-                AddEditScreenUI(navController = navController, noteColor = color)
+                AddEditScreenRoute(navController = navController, noteColor = color)
             }
 
         }
