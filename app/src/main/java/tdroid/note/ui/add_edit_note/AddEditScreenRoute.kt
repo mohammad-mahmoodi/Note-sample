@@ -46,10 +46,9 @@ import tdroid.note.ui.add_edit_note.components.HintUI
 fun AddEditScreenRoute(
     navController: NavController,
     noteColor: Int,
-    viewModel: AddEditNoteViewModel = hiltViewModel()
 ) {
 
-
+    val viewModel: AddEditNoteViewModel = hiltViewModel()
     // Getting all the latest events
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -202,8 +201,8 @@ fun AddEditScreen(  noteColor: Int,
 fun AddEditScreenPreview() {
 
     AddEditScreen(noteColor = 1 ,
-        noteTitle = NoteTextFieldState(text = "dfds" , hint = "dsfs" , false) ,
-        noteContent = NoteTextFieldState(text = "dfds" , hint = "dsfs" , false) ,
+        noteTitle = NoteTextFieldState(text = "test" , hint = "test" , false) ,
+        noteContent = NoteTextFieldState(text = "test" , hint = "test" , false) ,
         onEvent = {}
 
     )
