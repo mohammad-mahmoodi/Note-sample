@@ -6,14 +6,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import tdroid.note.feature_note.data.data_source.NoteDB
-import tdroid.note.feature_note.data.repository.NoteRepositoryImpl
-import tdroid.note.feature_note.domain.repository.NoteRepository
-import tdroid.note.feature_note.domain.usecases.AddNote
-import tdroid.note.feature_note.domain.usecases.DeleteNote
-import tdroid.note.feature_note.domain.usecases.GetNote
-import tdroid.note.feature_note.domain.usecases.GetNotes
-import tdroid.note.feature_note.domain.usecases.NoteUseCases
+import tdroid.note.data.data_source.NoteDB
+import tdroid.note.data.repository.NoteRepositoryImpl
+import tdroid.note.domain.repository.NoteRepository
+import tdroid.note.domain.usecases.AddNote
+import tdroid.note.domain.usecases.DeleteNote
+import tdroid.note.domain.usecases.GetNote
+import tdroid.note.domain.usecases.GetNotes
+import tdroid.note.domain.usecases.NoteUseCases
 import javax.inject.Singleton
 
 @Module

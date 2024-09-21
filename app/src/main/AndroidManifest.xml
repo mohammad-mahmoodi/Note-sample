@@ -14,7 +14,7 @@
         android:theme="@style/Theme.Notesappcompose"
         tools:targetApi="31">
         <activity
-            android:name="tdroid.note.feature_note.presentation.MainActivity"
+            android:name="tdroid.note.ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Notesappcompose">
