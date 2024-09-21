@@ -1,6 +1,9 @@
 package tdroid.note.data.repository
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import tdroid.note.data.data_source.NoteDao
 import tdroid.note.domain.model.Note
 import tdroid.note.domain.repository.NoteRepository
@@ -13,7 +16,7 @@ class NoteRepositoryImpl(
     }
 
     override suspend fun getNoteById(id: Int): Note? {
-        return dao.getNoteById(id)
+    return dao.getNoteById(id)
     }
 
     override suspend fun insertNote(note: Note) {

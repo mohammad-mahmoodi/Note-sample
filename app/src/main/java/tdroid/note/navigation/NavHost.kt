@@ -26,7 +26,7 @@ fun AppNavHost() {
             }
 
             composable(
-                route = NavScreen.AddEditNoteScreen.route,
+                route = NavScreen.AddEditNoteScreen.route + "?noteId={noteId}&noteColor={noteColor}",
                 arguments = listOf(
                     navArgument(name = "noteId") {
                         type = NavType.IntType
@@ -40,7 +40,8 @@ fun AppNavHost() {
                 )
             ) {
                 val color = it.arguments?.getInt("noteColor") ?: -1
-                AddEditScreenRoute(navController = navController, noteColor = color)
+                val editId = it.arguments?.getInt("noteId")
+                AddEditScreenRoute(navController = navController, noteColor = color , editId = editId)
             }
 
         }

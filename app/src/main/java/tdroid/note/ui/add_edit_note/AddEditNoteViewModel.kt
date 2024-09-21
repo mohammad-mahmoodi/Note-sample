@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -62,6 +63,16 @@ class AddEditNoteViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun getNote(id : Int) {
+        viewModelScope.launch() {
+          val editedNote =  noteUseCases.getIndividualNote(id)
+            _noteTitle.value = noteTitle.value.copy(text = editedNote?.title ?: "" , isHintVisible = false)
+            _noteContent.value = noteContent.value.copy(text  = editedNote?.content ?: "", isHintVisible = false)
+            _noteColor.value =  editedNote?.color ?: 0
+            _reminderDate.longValue = editedNote?.timeReminder ?: 0
         }
     }
 

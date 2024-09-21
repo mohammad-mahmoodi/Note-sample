@@ -60,11 +60,18 @@ import java.util.Locale
 fun AddEditScreenRoute(
     navController: NavController,
     noteColor: Int,
+    editId : Int?
 ) {
 
     val viewModel: AddEditNoteViewModel = hiltViewModel()
+
+
+
     // Getting all the latest events
     LaunchedEffect(key1 = true) {
+        if (editId != null) {
+            viewModel.getNote(editId)
+        }
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is AddEditNoteViewModel.UiEvent.ShowSnackbar -> {
