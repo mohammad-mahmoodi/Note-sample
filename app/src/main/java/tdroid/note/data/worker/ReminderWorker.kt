@@ -17,6 +17,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import tdroid.note.domain.model.Note
 import tdroid.note.domain.usecases.NoteUseCases
+import tdroid.note.ui.MainActivity
 
 
 @HiltWorker
@@ -40,9 +41,9 @@ fun showNotification(
     note: Note
 ) {
 
-//    val pendingIntent =
-//        PendingIntent.getActivity(context, reqCode, intent,
-//            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+    val pendingIntent =
+        PendingIntent.getActivity(context, 0, Intent(context , MainActivity::class.java),
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
     val CHANNEL_ID = "reminder" // The id of the channel.
     val notificationBuilder: NotificationCompat.Builder =
         NotificationCompat.Builder(context, CHANNEL_ID)
@@ -51,7 +52,7 @@ fun showNotification(
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_notification_overlay)
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-//            .setContentIntent(pendingIntent)
+            .setContentIntent(pendingIntent)
     val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

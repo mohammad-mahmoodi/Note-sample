@@ -1,5 +1,6 @@
 package tdroid.note.ui.add_edit_note
 
+import android.Manifest
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -45,8 +46,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.persistableBundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import tdroid.note.domain.model.Note
@@ -56,6 +64,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddEditScreenRoute(
     navController: NavController,
@@ -69,8 +78,8 @@ fun AddEditScreenRoute(
 
     // Getting all the latest events
     LaunchedEffect(key1 = true) {
-        if (editId != null) {
-            viewModel.getNote(editId)
+        if (editId != -1) {
+            viewModel.getNote(editId!!)
         }
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -90,8 +99,13 @@ fun AddEditScreenRoute(
             }
         }
     }
+    val notificationPermission = rememberPermissionState(
+        permission = Manifest.permission.POST_NOTIFICATIONS
+    )
+
 
     AddEditScreen(
+        notificationPermission = notificationPermission,
         noteColor = noteColor,
         noteTitle = viewModel.noteTitle.value,
         noteContent = viewModel.noteContent.value,
@@ -103,15 +117,17 @@ fun AddEditScreenRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddEditScreen(
+    notificationPermission: PermissionState?,
     noteColor: Int,
     onEvent: (AddEditNoteEvent) -> Unit,
     noteTitle: NoteTextFieldState,
     noteContent: NoteTextFieldState,
     reminderDate : Long
     ) {
+
     val noteBgAnimation = remember {
         Animatable(
             Color(
@@ -121,7 +137,6 @@ fun AddEditScreen(
     }
 
     var showDatePicker = remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
 //    val selectedDate = datePickerState.selectedDateMillis?.let {
 //        convertMillisToDate(it)
 //    } ?: ""
@@ -228,6 +243,15 @@ fun AddEditScreen(
                     Modifier
                         .padding(top = 12.dp)
                         .clickable {
+                            if (!notificationPermission?.status!!.isGranted) {
+                                if (notificationPermission.status.shouldShowRationale) {
+                                    // Show a rationale if needed (optional)
+                                } else {
+                                    // Request the permission
+                                    notificationPermission.launchPermissionRequest()
+
+                                }
+                            }
                             showDatePicker.value = !showDatePicker.value
                         }
                 )
@@ -316,6 +340,7 @@ fun convertMillisToDate(millis: Long): String {
     return formatter.format(Date(millis))
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 @Preview
 fun AddEditScreenPreview() {
@@ -324,6 +349,7 @@ fun AddEditScreenPreview() {
         noteTitle = NoteTextFieldState(text = "test" , hint = "test" , false) ,
         noteContent = NoteTextFieldState(text = "test" , hint = "test" , false) ,
         onEvent = {},
-        reminderDate = 0
+        reminderDate = 0,
+        notificationPermission = null
     )
 }

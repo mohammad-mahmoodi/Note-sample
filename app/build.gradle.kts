@@ -82,7 +82,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.2.0")
     kapt("androidx.hilt:hilt-compiler:1.2.0")
-    
+
     // Room
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
@@ -93,6 +93,8 @@ dependencies {
 
     val work_version = "2.9.1"
     implementation("androidx.work:work-runtime-ktx:$work_version")
+
+    implementation ("com.google.accompanist:accompanist-permissions:0.36.0")
 }
 
 // Allow references to generated code
