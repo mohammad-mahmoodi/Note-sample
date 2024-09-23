@@ -1,15 +1,20 @@
 package tdroid.note.data.repository
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import android.content.Context
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import tdroid.note.data.data_source.NoteDao
+import tdroid.note.data.worker.ReminderWorker
 import tdroid.note.domain.model.Note
 import tdroid.note.domain.repository.NoteRepository
+import java.util.concurrent.TimeUnit
 
-class NoteRepositoryImpl(
-    private val dao: NoteDao
+class NoteRepositoryImpl  constructor(
+    private val dao: NoteDao,
+     private val context: Context
 ) : NoteRepository {
     override fun getNotes(): Flow<List<Note>> {
         return dao.getNotes()
@@ -20,6 +25,22 @@ class NoteRepositoryImpl(
     }
 
     override suspend fun insertNote(note: Note) {
+
+        if (note.timeReminder != 0L ) {
+
+            val data = Data.Builder()
+                .putInt("id" , note.id ?: -1)
+                .build()
+
+            val myWorkRequest = OneTimeWorkRequest.Builder(ReminderWorker::class.java)
+                .setInitialDelay(note.timeReminder - System.currentTimeMillis()  , TimeUnit.MILLISECONDS)
+                .setInputData(data)
+                .build()
+
+            WorkManager.getInstance(context)
+                .enqueueUniqueWork("reminder" ,ExistingWorkPolicy.REPLACE, myWorkRequest)
+        }
+
         dao.insertNote(note)
     }
 

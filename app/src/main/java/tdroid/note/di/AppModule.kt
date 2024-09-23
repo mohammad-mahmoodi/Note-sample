@@ -1,10 +1,12 @@
 package tdroid.note.di
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import tdroid.note.data.data_source.NoteDB
 import tdroid.note.data.repository.NoteRepositoryImpl
@@ -32,9 +34,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNoteRepository(db: NoteDB): NoteRepository {
-        return NoteRepositoryImpl(db.noteDao)
+    fun provideNoteRepository(db: NoteDB , app: Application): NoteRepository {
+        return NoteRepositoryImpl(db.noteDao ,app.baseContext )
     }
+
+//    @Singleton
+//    @Provides
+//    fun provideWidgetDao(db: NoteDB) = db.noteDao
+//
 
     @Provides
     @Singleton
