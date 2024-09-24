@@ -7,14 +7,14 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import kotlinx.coroutines.flow.Flow
 import tdroid.note.data.data_source.NoteDao
-import tdroid.note.data.worker.ReminderWorker
+import tdroid.note.service.worker.ReminderWorker
 import tdroid.note.domain.model.Note
 import tdroid.note.domain.repository.NoteRepository
 import java.util.concurrent.TimeUnit
 
 class NoteRepositoryImpl  constructor(
     private val dao: NoteDao,
-     private val context: Context
+    private val workManager: WorkManager
 ) : NoteRepository {
     override fun getNotes(): Flow<List<Note>> {
         return dao.getNotes()
@@ -37,8 +37,7 @@ class NoteRepositoryImpl  constructor(
                 .setInputData(data)
                 .build()
 
-            WorkManager.getInstance(context)
-                .enqueueUniqueWork("reminder" ,ExistingWorkPolicy.REPLACE, myWorkRequest)
+            workManager.enqueueUniqueWork("reminder" ,ExistingWorkPolicy.REPLACE, myWorkRequest)
         }
 
         dao.insertNote(note)
