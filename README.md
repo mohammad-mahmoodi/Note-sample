@@ -1,5 +1,3 @@
-<div align="center">
-<img width="500" src="https://github.com/utkarsh006/Notes-app-compose/assets/94545831/d16b218d-abf3-46cb-a1c1-137301df6bed" /></div>
 
 ## Notes App Compose 📒
 
