@@ -47,8 +47,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
+    implementation("androidx.compose.material3:material3:1.3.0")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.0")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
